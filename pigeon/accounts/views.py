@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect
 from .models import User
 from .forms import UserRegistrationForm, VerifyForm
 from django.contrib.auth.decorators import login_required
-from .verify import send_otp, check_otp
 from .decorators import verification_required
+from django.contrib import messages
+from .tasks import send_phone_verification
+from .verify import verify_otp
+
 
 @login_required
 @verification_required
@@ -22,7 +25,7 @@ def register(request):
             new_user.set_password(form.cleaned_data['password1'])
             # Save the User object
             new_user.save()
-            send_otp(form.cleaned_data.get('phone'))
+            send_phone_verification.delay(form.cleaned_data.get('phone'))
             return redirect("dashboard")
     return render(request, template_name, {'form': form})
 
@@ -34,10 +37,12 @@ def verify_code(request):
         form = VerifyForm(request.POST)
         if form.is_valid():
             code = form.cleaned_data.get('code')
-            if check_otp(request.user.phone, code):
+            if verify_otp(request.user.phone, code):
                 request.user.is_verified = True
                 request.user.save()
                 return redirect('dashboard')
+            else:
+                messages.error(request, 'Invalid code provided')
     else:
         form = VerifyForm()
     return render(request, template_name, {'form': form})
