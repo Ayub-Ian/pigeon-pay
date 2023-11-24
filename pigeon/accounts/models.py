@@ -45,3 +45,14 @@ class User(AbstractBaseUser):
     def save_last_login(self) -> None:
         self.last_login = datetime.now()
         self.save()
+
+
+class Buyer(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                primary_key=True)
+    
+class Seller(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                primary_key=True)

@@ -3,4 +3,5 @@
 {% block content %}
   <h1>Dashboard</h1>
   <p>Welcome to your dashboard.</p>
+  <a href="{% url "transactions:transaction_create" %}">New transaction</a>
 {% endblock %}
