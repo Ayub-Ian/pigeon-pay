@@ -27,7 +27,7 @@ class User(AbstractBaseUser):
         ordering = ['-created_at']
 
     def __str__(self) -> str:
-        return f'{self.first_name} {self.last_name}'
+        return self.email
     
     @property
     def is_superuser(self):
@@ -55,4 +55,5 @@ class Buyer(models.Model):
 class Seller(models.Model):
     user = models.OneToOneField(User,
                                 on_delete=models.CASCADE,
-                                primary_key=True)
+                                primary_key=True
+                                )

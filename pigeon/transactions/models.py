@@ -4,15 +4,19 @@ from accounts.models import Buyer, Seller, User
 
 
 class Transaction(models.Model):
-    amount = models.DecimalField(max_digits=10,decimal_places=2)
+    amount = models.DecimalField(max_digits=10,decimal_places=2, null=True, blank=True)
     title = models.CharField(max_length=255, null=False, blank=False)
     url = models.CharField(max_length=255, null=True, blank=True)
     buyer = models.ForeignKey(Buyer,
                               on_delete=models.CASCADE,
-                              related_name="buyer_transactions")
+                              related_name="buyer_transactions",
+                              null=True,
+                              blank=True)
     seller = models.ForeignKey(Seller,
                                on_delete=models.CASCADE,
-                               related_name='seller_transactions')
+                               related_name='seller_transactions',
+                               null=True,
+                               blank=True)
     initiator = models.ForeignKey(User,
                                   on_delete=models.CASCADE,
                                   related_name='initiated_transactions')
