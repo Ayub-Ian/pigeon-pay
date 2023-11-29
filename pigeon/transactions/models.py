@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import Buyer, Seller, User
+from django.urls import reverse
 
 
 
@@ -22,6 +23,11 @@ class Transaction(models.Model):
                                   related_name='initiated_transactions')
     initiator_role = models.CharField(max_length=10, choices=[('buyer', 'Buyer'), ('seller', 'Seller')])
 
+    def __str__(self) -> str:
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse("transactions:transaction_detail",args = [self.id])
 
 class Category(models.Model):
     name = models.CharField(max_length=200)

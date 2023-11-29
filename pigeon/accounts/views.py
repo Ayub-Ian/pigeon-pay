@@ -9,7 +9,7 @@ from .verify import verify_otp
 
 
 @login_required
-@verification_required
+# @verification_required
 def dashboard(request):
     return render(request, 'accounts/dashboard.html')
 

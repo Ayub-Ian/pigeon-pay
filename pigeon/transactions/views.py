@@ -2,6 +2,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .forms import TransactionForm, ProductForm
 from accounts.models import Seller, Buyer, User
 from django.contrib.auth.decorators import login_required
+from .models import Transaction
+
+
+@login_required
+def transaction_list(request):
+    transactions = Transaction.objects.filter(initiator = request.user.id)
+    return render(request, "transactions/list.html", {'transactions': transactions})
+
+@login_required
+def transaction_detail(request, id):
+    transaction = get_object_or_404(Transaction, id=id)
+    return render(request, "transactions/transaction/detail.html", {'transaction': transaction})
 
 @login_required
 def transaction_create(request):

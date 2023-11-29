@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+ Transactions
+{% endblock %}
+{% block content %}
+
+    {% for transaction in transactions %}
+    <ol>
+        <li>
+            <a href="{{ transaction.get_absolute_url }}">{{ transaction.title }}</a>
+            <p>{{ transaction.initiator}}</p>
+            <p>{% if transaction.seller == None %}None{% else %}{{ transaction.seller.user }}{% endif %}</p>
+            <p>{% if transaction.buyer == None %}None{% else %}{{ transaction.buyer.user }}{% endif %}</p>
+            <p>{{ transaction.amount }}</p>
+        </li>
+    </ol>
+    {% endfor %}
+{% endblock %}
