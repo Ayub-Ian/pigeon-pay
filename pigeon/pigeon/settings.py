@@ -39,7 +39,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # Third party apps
+    
 
     # Local apps
     'accounts.apps.AccountsConfig',
@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third party apps
+    'compressor'
 ]
 
 MIDDLEWARE = [
@@ -67,7 +69,7 @@ ROOT_URLCONF = 'pigeon.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -149,3 +151,10 @@ LOGOUT_URL = 'logout'
 TWILIO_VERIFY_SERVICE_SID=env('TWILIO_VERIFY_SERVICE_SID')
 TWILIO_ACCOUNT_SID=env('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN=env('TWILIO_AUTH_TOKEN')
+
+
+COMPRESS_ROOT = BASE_DIR / 'tailwind'
+
+COMPRESS_ENABLED = True
+
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
