@@ -5,8 +5,9 @@
 {% endblock %}
 {% block content %}
 
+<ol>
     {% for transaction in transactions %}
-    <ol>
+    
         <li>
             <a href="{{ transaction.get_absolute_url }}">{{ transaction.title }}</a>
             <p>{{ transaction.initiator}}</p>
@@ -14,6 +15,7 @@
             <p>{% if transaction.buyer == None %}None{% else %}{{ transaction.buyer.user }}{% endif %}</p>
             <p>{{ transaction.amount }}</p>
         </li>
-    </ol>
+    
     {% endfor %}
+    </ol>
 {% endblock %}

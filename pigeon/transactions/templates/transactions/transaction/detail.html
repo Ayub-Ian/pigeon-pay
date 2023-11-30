@@ -4,6 +4,10 @@
     {{ transaction.title }}
 {% endblock %}
 {% block content %}
+     <p>Title</p>
     {{ transaction.title }}
-    
+    <p>Products</p>
+    {% for product in product_list %}
+    <p>{{ product.name }}</p>
+    {% endfor %}
 {% endblock %}

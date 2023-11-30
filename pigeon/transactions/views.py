@@ -13,7 +13,8 @@ def transaction_list(request):
 @login_required
 def transaction_detail(request, id):
     transaction = get_object_or_404(Transaction, id=id)
-    return render(request, "transactions/transaction/detail.html", {'transaction': transaction})
+    product_list = transaction.products.all()
+    return render(request, "transactions/transaction/detail.html", {'transaction': transaction, 'product_list':product_list})
 
 @login_required
 def transaction_create(request):
