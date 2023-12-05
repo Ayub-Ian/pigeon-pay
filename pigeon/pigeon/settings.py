@@ -157,4 +157,7 @@ COMPRESS_ROOT = BASE_DIR / 'tailwind'
 
 COMPRESS_ENABLED = True
 
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+STATICFILES_FINDERS = ['compressor.finders.CompressorFinder',
+                       'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+                       'django.contrib.staticfiles.finders.FileSystemFinder'
+                       ]
