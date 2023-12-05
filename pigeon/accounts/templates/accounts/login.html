@@ -1,19 +1,41 @@
-{% extends 'base.html' %}
+{% extends "_base.html" %}
+{% block title %}Login to your account {% endblock %}
 
-{% block content %}
+{% block body %}
+
+<div class="flex justify-center flex-col relative mx-4 pt-7">
+  <div class="pb-6 pl-5 h-12 w-12 ">
+    <svg class=" h-auto w-full" width="250" height="362" viewBox="0 0 250 362" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 288.633L125 216.598V360.668L0 288.633Z" fill="#5D20D2"/>
+      <path d="M0 144.57L125 72.5352V216.605L0 144.57Z" fill="#5D20D2"/>
+      <path d="M125 72.5352L0 144.57V0.5L125 72.5352Z" fill="#5D20D2"/>
+      <path d="M125 216.605L0 288.641V144.562L125 216.605Z" fill="#5D20D2"/>
+      <path d="M0 288.535V144.465L125 216.5L0 288.535Z" fill="#C02AD1"/>
+      <path d="M0 144.57L125 72.5352V216.605L0 144.57Z" fill="#C02AD1"/>
+      <path d="M249.828 144.504L124.832 216.539V72.4648L249.828 144.504Z" fill="#C02AD1"/>
+      </svg>
+      
+  </div>
+  <div class="bg-white rounded-xl pt-8 px-5 flex justify-start flex-col  shadow-lg">
 {% if form.errors %}
 <p>
   Your username and password didn't match.
   Please try again.
 </p>
 {% else %}
-<p>Please, use the following form to log-in:</p>
+<p class="text-[#192851] tracking-tight text-2xl font-medium leading-8">Sign in to your account</p>
 {% endif %}
-  <form method="post" action="{% url 'login' %}">
+<div class="mt-5 pb-3">
+  <form method="post"  action="{% url 'login' %}">
     {% csrf_token %}
-    {{ form.as_p }}
+    
+    {{ form.as_p}}
     <input type="hidden" name="next" value="{{ next }}" />
-    <button type="submit">Log in</button>
+    <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Log in</button>
   </form>
-  <p>Don't have an account? <a href="{% url 'register' %}">Register</a> now!</p>
+  <p>Don't have an account? <a href="{% url 'register' %}">Create an account</a> </p>
+</div>
+</div>
+</div>
+
 {% endblock %}
