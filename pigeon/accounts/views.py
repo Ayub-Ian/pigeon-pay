@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from .models import User
-from .forms import UserRegistrationForm, VerifyForm
+from .forms import UserRegistrationForm, VerifyForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .decorators import verification_required
 from django.contrib import messages
 from .tasks import send_phone_verification
 from .verify import verify_otp
+from django.contrib.auth.views import LoginView
+
 
 
 @login_required
@@ -46,3 +48,7 @@ def verify_code(request):
     else:
         form = VerifyForm()
     return render(request, template_name, {'form': form})
+
+class LoginView(LoginView):
+    template_name = 'accounts/login.html'
+    authentication_form = CustomAuthenticationForm
