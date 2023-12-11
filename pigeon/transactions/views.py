@@ -5,14 +5,21 @@ from django.contrib.auth.decorators import login_required
 from .models import Transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
 from django.db.models import Q
+
 
 
 
 @login_required
 def transaction_list(request):
-    current_user = get_object_or_404(User, id=request.user.id)
-    transactions = Transaction.objects.filter(initiator = request.user)
+    buyer_instance = get_object_or_404(Buyer, user_id=request.user.id)
+    seller_instance = get_object_or_404(Seller, user_id=request.user.id)
+    transactions = Transaction.objects.filter(
+        Q(initiator = request.user) |
+        Q(seller = seller_instance) | 
+        Q(buyer = buyer_instance)
+    )
     return render(request, "transactions/list.html", {'transactions': transactions})
 
 @login_required
@@ -75,17 +82,21 @@ class TransactionAcceptanceView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         self.transaction = form.cleaned_data['transaction']
 
-        breakpoint()
-        if self.transaction.seller == None:
-            seller_instance, created = Seller.objects.get_or_create(user_id=self.request.user.id)
-            #breakpoint()
-            #self.transaction.seller.add(seller_instance[0])
-            self.transaction.seller = seller_instance[0]
+        if form.is_valid():
+            if self.transaction.seller == None:
+                 # If seller is None, create a Seller instance and associate it with the transaction
+                seller_instance, created = Seller.objects.get_or_create(user_id=self.request.user.id)
+                self.transaction.seller = seller_instance
+            else:
+                # If seller is already assigned, assume we are updating the buyer
+                buyer_instance, created = Buyer.objects.get_or_create(user_id=self.request.user.id)
+                self.transaction.buyer = buyer_instance
         else:
-            buyer_instance, created = Buyer.objects.get_or_create(user_id=self.request.user.id)
-            #self.transaction.buyer.add(buyer_instance[0])
-            self.transaction.buyer=buyer_instance
+            print(form.errors)
+
+        self.transaction.save()
         return super().form_valid(form)
     
     def get_success_url(self):
-        return redirect('dashboard')
+        return reverse_lazy('transactions:transaction_detail',
+                            args=[self.transaction.id])
