@@ -1,0 +1,108 @@
+{% extends '_base.html' %}
+{% block title %}
+ {{ transaction.title }} | Confirmation screen
+{% endblock %}
+
+{% block body %}
+
+
+<div class="w-full mx-auto mt-20 max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+    <div class=" mb-4">
+        <div class="flex items-center text-gray-500 uppercase gap-2 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+              </svg>
+              <span>Amount</span>              
+        </div>
+        <p class="text-lg font-medium">20,0000
+
+            <span class="text-lg text-gray-400">KES</span>
+        </p>
+        
+
+   </div>
+   <div class="flow-root">
+    <div class="mb-4">
+        <div class="border-b border-gray-200">
+        <p class="font-medium mb-2">Transaction details</p>
+    </div>
+
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Title</span>
+        <p class="flex-1">{{ transaction.title}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Initiator</span>
+        <p class="flex-1">{{ transaction.initiator}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Date created</span>
+        <p class="flex-1">06/12/2023</p>
+    </div>
+
+    </div>
+
+    <div class="mb-4">
+        <div class="border-b border-gray-200">
+        <p class="font-medium mb-2">Transaction products</p>
+    </div>
+
+    {% for product in product_list %}
+
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Product name</span>
+        <p class="flex-1">{{ product.name}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Price</span>
+        <p class="flex-1">{{ product.price}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Description</span>
+        <p class="flex-1">{{ product.description}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Category</span>
+        <p class="flex-1">{{ product.category}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Inspection period</span>
+        <p class="flex-1">{{ product.inspection_period}}</p>
+    </div>
+
+    {% endfor %}
+
+
+    </div>
+
+    <div class="mb-4">
+        <div class="border-b border-gray-200">
+        <p class="font-medium mb-2">Transaction terms</p>
+    </div>
+
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Seller</span>
+        <p class="flex-1">{{ transaction.seller.user}}</p>
+    </div>
+    <div class="flex items-center py-1 text-sm">
+        <span class="flex-1 text-gray-400">Buyer</span>
+        <p class="flex-1">{{ transaction.buyer.user}}</p>
+    </div>
+        
+
+    </div>
+
+   </div>
+
+   {% if request.user.is_authenticated %}
+   <form action="{% url "transactions:user_accept_transaction" %}" method="post">
+    {% csrf_token %}
+    {{acceptance_form}}
+    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Accept transaction</button>
+   </form>
+   {% else %}
+   <a href="{% url "login" %}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Sign in to continue</a>
+   {% endif %}
+</div>
+
+{% endblock %}
