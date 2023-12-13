@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .forms import TransactionForm, ProductForm, AcceptanceForm
 from accounts.models import Seller, Buyer, User
 from django.contrib.auth.decorators import login_required
-from .models import Transaction
+from .models import Transaction, TransactionHistory
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
@@ -62,7 +62,17 @@ def transaction_create(request):
             product = product_form.save(commit=False)
             product.transaction = transaction
             product.save()
-            print("Transaction has been saved")
+                    
+            transaction.status = Transaction.ACTION_REQUIRED
+            transaction.action_description = "Please review and accept the terms."
+
+
+            TransactionHistory.objects.create(
+            transaction=transaction,
+            user=current_user,
+            action_description="Transaction was created by {}: ({})".format(transaction['initiator_role'],current_user)
+            )
+            
             return redirect("dashboard")
 
     else:
@@ -94,7 +104,18 @@ class TransactionAcceptanceView(LoginRequiredMixin, FormView):
         else:
             print(form.errors)
 
+
         self.transaction.save()
+                
+        self.transaction.status = Transaction.ACTION_REQUIRED
+        self.transaction.action_description = "Please pay for the for transaction."
+
+
+        TransactionHistory.objects.create(
+            transaction=self.transaction,
+            user=self.request.user,
+            action_description="Transaction was accepted by: ({})".format(self.request.user)
+        )
         return super().form_valid(form)
     
     def get_success_url(self):
