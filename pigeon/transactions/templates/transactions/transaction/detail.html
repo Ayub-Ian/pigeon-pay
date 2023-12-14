@@ -23,6 +23,8 @@
 
      {% endif %}
 
+     <p></p>
+
       <p class="font-semibold text-lg mb-4">Transaction details</p>
       <div class="grid gap-6 grid-cols-4 mb-4 [&>div>p]:text-sm">
         <div class="flex flex-col space-y-1.5">
@@ -89,8 +91,8 @@
 <ol class="relative border-s border-gray-200 dark:border-gray-700">
   {% for history_entry in transaction.transactionhistory_set.all %}
 
-    <li class="ms-4">
-        <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
+    <li class="ms-4 relative">
+        <div class="absolute w-3 h-3 bg-gray-200 rounded-full bottom-1 -start-[22px] border border-white dark:border-gray-900 dark:bg-gray-700"></div>
         <span class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">{{ history_entry.action_timestamp }}</span>
         <p class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ history_entry.action_description }} 	</p>
     </li>

@@ -43,7 +43,9 @@ def transaction_create(request):
         
         transaction_form = TransactionForm(request.POST, prefix="transaction")
         product_form = ProductForm(request.POST, prefix="product")
+        product = product_form.save(commit=False)
 
+        
         if transaction_form.is_valid() and product_form.is_valid():
             transaction_data = transaction_form.cleaned_data
             # Create the transaction instance first
@@ -58,19 +60,18 @@ def transaction_create(request):
                 seller_instance = Seller.objects.get_or_create(user_id=request.user.id)
                 transaction.seller = seller_instance[0]
             transaction.initiator = current_user
+            transaction.amount = product.price
+            transaction.status = Transaction.ACTION_REQUIRED
+            transaction.action_description = "Please review and accept the terms."
             transaction.save()
-            product = product_form.save(commit=False)
             product.transaction = transaction
             product.save()
                     
-            transaction.status = Transaction.ACTION_REQUIRED
-            transaction.action_description = "Please review and accept the terms."
-
 
             TransactionHistory.objects.create(
             transaction=transaction,
             user=current_user,
-            action_description="Transaction was created by {}: ({})".format(transaction['initiator_role'],current_user)
+            action_description="Transaction was created by {}: ({})".format(transaction_data['initiator_role'],current_user)
             )
             
             return redirect("dashboard")
