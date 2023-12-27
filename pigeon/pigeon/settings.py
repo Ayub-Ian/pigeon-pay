@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     
 
     # Local apps
+    'payment.apps.PaymentConfig',
     'accounts.apps.AccountsConfig',
     'transactions.apps.TransactionsConfig',
     'django.contrib.admin',
@@ -151,13 +152,30 @@ LOGOUT_URL = 'logout'
 TWILIO_VERIFY_SERVICE_SID=env('TWILIO_VERIFY_SERVICE_SID')
 TWILIO_ACCOUNT_SID=env('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN=env('TWILIO_AUTH_TOKEN')
+STATIC_ROOT = os.path.join(BASE_DIR,"static_root")
 
 
 COMPRESS_ROOT = BASE_DIR / 'tailwind'
+# COMPRESS_ROOT = STATIC_ROOT
+
+COMPRESS_FILTERS = {
+    'css':[
+        'compressor.filters.css_default.CssAbsoluteFilter',
+        'compressor.filters.cssmin.rCSSMinFilter',
+    ],
+    'js':[
+        'compressor.filters.jsmin.JSMinFilter',
+    ]
+}
 
 COMPRESS_ENABLED = True
 
-STATICFILES_FINDERS = ['compressor.finders.CompressorFinder',
+STATICFILES_DIRS = [
+    BASE_DIR / "tailwind"
+]
+
+STATICFILES_FINDERS = [
                        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-                       'django.contrib.staticfiles.finders.FileSystemFinder'
+                       'django.contrib.staticfiles.finders.FileSystemFinder',
+                       'compressor.finders.CompressorFinder',
                        ]

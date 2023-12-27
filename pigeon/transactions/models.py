@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Buyer, Seller, User
 from django.urls import reverse
+import uuid
 
 
 
@@ -19,6 +20,12 @@ class Transaction(models.Model):
         (ACTION_REQUIRED, 'Action Required'),
     ]
 
+    FEE_PAYMENT_CHOICES = [
+        ("buyer", 'Buyer'),
+        ("seller", 'Seller'),
+        ("split", 'Split')
+    ]
+    
     amount = models.DecimalField(max_digits=10,decimal_places=2, null=True, blank=True)
     title = models.CharField(max_length=255, null=False, blank=False)
     url = models.CharField(max_length=255, null=True, blank=True)
@@ -38,13 +45,19 @@ class Transaction(models.Model):
     initiator_role = models.CharField(max_length=10, choices=[('buyer', 'Buyer'), ('seller', 'Seller')])
     action_description = models.TextField(blank=True, null=True)  
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=PENDING)
-
+    reference_no = models.CharField(blank=True, unique=True, editable=False, max_length=10, default=uuid.uuid4().hex[:10])
+    fee_paid_by = models.CharField(choices=FEE_PAYMENT_CHOICES, max_length=6)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.title
 
     def get_absolute_url(self):
         return reverse("transactions:transaction_detail",args = [self.id])
+    
+
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200)

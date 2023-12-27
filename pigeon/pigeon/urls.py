@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import index
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
+    path('payment/',include('payment.urls'), name='payment'),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('transactions/', include('transactions.urls'), name='transactions'),
     path('admin/', admin.site.urls),
     path('', index, name="index")
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.db.models import Q
+from payment.forms import MpesaSTKForm
 
 
 
@@ -26,7 +27,7 @@ def transaction_list(request):
 def transaction_detail(request, id):
     transaction = get_object_or_404(Transaction, id=id)
     product_list = transaction.products.all()
-    return render(request, "transactions/transaction/detail.html", {'transaction': transaction, 'product_list':product_list})
+    return render(request, "transactions/transaction/detail.html", {'transaction': transaction, 'product_list':product_list, 'MpesaSTKForm': MpesaSTKForm})
 
 
 def transaction_preview(request, id):

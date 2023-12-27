@@ -1,0 +1,18 @@
+#id_transaction-initiator_role div:first-child {
+    display: none;
+  }
+  .role-select label {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .role-select input[type="radio"]:checked + label {
+    background-color: #3498db;
+    color: #fff;
+    border-color: #3498db;
+  }
+  

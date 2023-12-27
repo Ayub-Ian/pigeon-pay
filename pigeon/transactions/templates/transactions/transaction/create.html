@@ -1,19 +1,49 @@
 {% extends "base.html" %}
+{% load static %}
+{% load compress %}
+{% block css %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'transactions/css/transaction.css' %}" >
+{% endcompress %}
+{% endblock %}
 {% block title %}
     New transaction
 {% endblock %}
 
 {% block content %}
 
-<h1>Create new transaction</h1>
+<div class="w-full max-w-2xl p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+<h1 class="text-xl font-semibold capitalize leading-none text-gray-900 dark:text-white mb-3">New Escrow Transaction</h1>
 
 <form method="post">
     {% csrf_token %}
+    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <div class="space-y-2 mb-5">
     <h3>Transaction details</h3>
     {{ transaction_form.as_p }}
-    <h3>Product details</h3>
+    <div class="">
+        <h3 class="text-center capitalize font-medium text-sm text-gray-500">Payment information</h3>
+        <span>
+            <h3>Transaction amount</h3>
+        </span>
+        <span>
+            <h3 class="">Escrow fees 1.8%</h3>
+        </span>
+        <span>
+            <h3 class="">Final amount to be paid</h3>
+        </span>
+    </div>
+</div>
+
+<div class="space-y-2 mb-5">
+    <h3 class="font-medium">Product details</h3>
     {{ product_form.as_p }}
+</div>
+</div>
     <button type="submit">Create transaction</button>
+
 </form>
+</div>
 
 {% endblock %}
