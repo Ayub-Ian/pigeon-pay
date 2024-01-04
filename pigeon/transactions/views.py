@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import TransactionForm, ProductForm, AcceptanceForm
+from .forms import TransactionForm, ProductForm, AcceptanceForm, ProductFileForm, RecepientDetailsForm
 from accounts.models import Seller, Buyer, User
 from django.contrib.auth.decorators import login_required
 from .models import Transaction, TransactionHistory
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from payment.forms import MpesaSTKForm
+from .tasks import send_confirmation_email
 
 
 
@@ -40,14 +41,12 @@ def transaction_preview(request, id):
 @login_required
 def transaction_create(request):
     current_user = get_object_or_404(User, id=request.user.id)
+    
     if request.method == 'POST':
         
         transaction_form = TransactionForm(request.POST, prefix="transaction")
-        product_form = ProductForm(request.POST, prefix="product")
-        product = product_form.save(commit=False)
-
         
-        if transaction_form.is_valid() and product_form.is_valid():
+        if transaction_form.is_valid():
             transaction_data = transaction_form.cleaned_data
             # Create the transaction instance first
             transaction = transaction_form.save(commit=False)
@@ -61,13 +60,22 @@ def transaction_create(request):
                 seller_instance = Seller.objects.get_or_create(user_id=request.user.id)
                 transaction.seller = seller_instance[0]
             transaction.initiator = current_user
-            transaction.amount = product.price
             transaction.status = Transaction.ACTION_REQUIRED
             transaction.action_description = "Please review and accept the terms."
             transaction.save()
-            product.transaction = transaction
-            product.save()
-                    
+
+
+            if request.POST['submission_type'] == 'file':
+                product_file_form = ProductFileForm(request.POST, request.FILES, prefix="product_file")
+                product_file = product_file_form.save(commit=False)
+                product_file.transaction = transaction
+                product_file.save()
+            elif request.POST['submission_type'] == 'manual':
+                product_form = ProductForm(request.POST, prefix="product")
+                product = product_form.save(commit=False)
+                product.transaction = transaction
+                product.save()
+
 
             TransactionHistory.objects.create(
             transaction=transaction,
@@ -75,17 +83,42 @@ def transaction_create(request):
             action_description="Transaction was created by {}: ({})".format(transaction_data['initiator_role'],current_user)
             )
             
-            return redirect("dashboard")
+            recepient_details_form = RecepientDetailsForm(request.POST, prefix="recepient")
+            if recepient_details_form.is_valid():
+                recepient_details = recepient_details_form.cleaned_data
+
+            transaction_data = {
+                'title' : transaction.title,
+                'amount' : transaction.amount,
+                'role' : transaction.initiator_role,
+                'reference_no': transaction.reference_no,
+                'shareable_url': transaction.shareable_url
+            }
+            send_confirmation_email.delay(transaction=transaction_data,
+                                          sender_name=current_user.first_name, 
+                                          sender_email=current_user.get_username(),
+                                          recepient_mail=recepient_details['email'],
+                                          recepient_name=recepient_details['name'] )
+            
+            return redirect(reverse("transactions:transaction_created", args=[transaction.id]))
 
     else:
         transaction_form = TransactionForm(prefix="transaction")
         product_form = ProductForm(prefix="product")
+        product_file_form = ProductFileForm(prefix="product_file")
+        recepient_details_form = RecepientDetailsForm(prefix="recepient")
     
     return render(request, 
                   'transactions/transaction/create.html',
                   {'transaction_form': transaction_form,
-                   'product_form':product_form})
+                   'product_form':product_form,
+                   'product_file_form': product_file_form,
+                   'recepient_details_form': recepient_details_form})
 
+@login_required
+def transaction_created(request, id):
+    transaction = get_object_or_404(Transaction, id= id)
+    return render(request, 'transactions/transaction/created.html', {'transaction': transaction})
 
 class TransactionAcceptanceView(LoginRequiredMixin, FormView):
     transaction = None

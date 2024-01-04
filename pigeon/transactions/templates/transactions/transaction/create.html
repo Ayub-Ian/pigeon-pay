@@ -16,34 +16,124 @@
 
 <h1 class="text-xl font-semibold capitalize leading-none text-gray-900 dark:text-white mb-3">New Escrow Transaction</h1>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="divide-y divide-gray-200 dark:divide-gray-700">
         <div class="space-y-2 mb-5">
     <h3>Transaction details</h3>
     {{ transaction_form.as_p }}
+
     <div class="">
         <h3 class="text-center capitalize font-medium text-sm text-gray-500">Payment information</h3>
-        <span>
+        <span class="flex justify-between">
             <h3>Transaction amount</h3>
+            <p id="transaction_amount">0.00</p>
         </span>
-        <span>
+        <span class="flex justify-between">
             <h3 class="">Escrow fees 1.8%</h3>
+            <p id="transaction_fee_amount">0.00</p>
         </span>
-        <span>
+        <span class="flex justify-between">
             <h3 class="">Final amount to be paid</h3>
+            <p id="transaction_total_payable">0.00</p>
         </span>
     </div>
 </div>
 
 <div class="space-y-2 mb-5">
     <h3 class="font-medium">Product details</h3>
-    {{ product_form.as_p }}
+    <input type="radio" name="submission_type" value="file" checked> Submit File
+    <div id="file-form">
+        {{ product_file_form.as_p }}
+    </div>
+    
+    <input type="radio" name="submission_type" value="manual"> Submit Manual Input
+    <div id="product-form" style="display: none;">
+        {{ product_form.as_p }}    
+    </div>
+    
 </div>
+
+<div class="space-y-2 mb-5">
+    <h3 class="font-medium">Recepient details</h3>
+   
+    <div >
+        {{ recepient_details_form.as_p }}
+    </div>
+    
+
+    
 </div>
-    <button type="submit">Create transaction</button>
+
+
+</div>
+    <button class="bg-blue-500 text-white rounded-lg px-5 py-2.5" type="submit">Create transaction</button>
 
 </form>
 </div>
 
+{% endblock %}
+
+{% block script %}
+{% compress js %}
+<script>
+
+   document.addEventListener('DOMContentLoaded', function() {
+
+   const amountInput = document.getElementById("id_transaction-amount");
+   const amount = document.getElementById("transaction_amount")
+   const fees = document.getElementById("transaction_fee_amount")
+   const payableAmount = document.getElementById("transaction_total_payable")
+   amountInput.addEventListener("change", (e) => {
+    let value = parseFloat(e.target.value)
+    console.log(typeof value)
+    amount.textContent = value.toFixed(2)
+    // calculate escrow fees 
+    let transactionFee = value * (1.8/100)
+    fees.textContent = transactionFee.toFixed(2)
+
+    // calculate total payable amount for the transaction
+    let totalAmount = value + transactionFee
+    payableAmount.textContent = totalAmount.toFixed(2)
+   })
+
+   // display product form or product file form
+        const submissionTypeInputs = document.getElementsByName('submission_type');
+        
+
+        for (var i = 0; i < submissionTypeInputs.length; i++) {
+            submissionTypeInputs[i].addEventListener('change', function() {
+                var selectedValue = this.value;
+
+                if (selectedValue === 'file') {
+                    document.getElementById('file-form').style.display = 'block';
+                    document.getElementById('product-form').style.display = 'none';
+
+                    // remove required attribute in the product form
+                    document.getElementsByName("product-name")[0].removeAttribute('required')
+                    document.getElementsByName("product-description")[0].removeAttribute('required')
+                    document.getElementsByName("product-price")[0].removeAttribute('required')
+
+                    document.getElementsByName("product_file-title")[0].setAttribute('required', 'required')
+                    document.getElementsByName("product_file-file")[0].setAttribute('required', 'required')
+                } else if (selectedValue === 'manual') {
+                    document.getElementById('file-form').style.display = 'none';
+                    document.getElementById('product-form').style.display = 'block';
+
+                    document.getElementsByName("product-name")[0].setAttribute('required', 'required')
+                    document.getElementsByName("product-description")[0].setAttribute('required', 'required')
+                    document.getElementsByName("product-price")[0].setAttribute('required', 'required')
+
+                    document.getElementsByName("product_file-title")[0].removeAttribute('required')
+                    document.getElementsByName("product_file-file")[0].removeAttribute('required')
+                }
+            });
+        }
+
+
+    });
+
+   
+</script>
+{% endcompress %}
 {% endblock %}

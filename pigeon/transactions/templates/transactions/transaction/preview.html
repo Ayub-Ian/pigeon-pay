@@ -14,7 +14,7 @@
               </svg>
               <span>Amount</span>              
         </div>
-        <p class="text-lg font-medium">20,0000
+        <p class="text-lg font-medium">{{ transaction.amount }}
 
             <span class="text-lg text-gray-400">KES</span>
         </p>
@@ -37,7 +37,7 @@
     </div>
     <div class="flex items-center py-1 text-sm">
         <span class="flex-1 text-gray-400">Date created</span>
-        <p class="flex-1">06/12/2023</p>
+        <p class="flex-1">{{ transaction.created }}</p>
     </div>
 
     </div>
